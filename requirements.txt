@@ -1,0 +1,51 @@
+# ============================================================
+# Production RAG System — Requirements
+# ============================================================
+# Install: pip install -r requirements.txt
+# ============================================================
+
+# --- Core / Utilities ---
+python-dotenv>=1.0.0
+pyyaml>=6.0
+tqdm>=4.66.0
+numpy>=1.26.0
+
+# --- Document Ingestion & Parsing ---
+arxiv>=2.1.0
+pymupdf>=1.25.0               # PDF text + layout extraction (fast, reliable)
+
+# --- Text Chunking & Processing ---
+langchain-text-splitters>=0.3.4
+tiktoken>=0.8.0               # Token counting for chunk size control
+
+# --- Embeddings ---
+sentence-transformers>=3.3.0  # Embedding models + cross-encoder re-ranking
+
+# --- Vector Store ---
+chromadb>=0.6.0               # Vector DB (lightweight, great for prototyping)
+
+# --- Sparse Retrieval (BM25) ---
+rank-bm25>=0.2.2              # BM25 sparse retrieval
+
+# --- LLM / Generation ---
+groq>=0.9.0                   # Primary: Llama-3.1 70B (free tier: 30 RPM)
+google-generativeai>=0.8.0    # Fallback: Gemini Flash free API (15 RPM)
+google-genai>=1.0.0           # Vertex AI: Gemini via GCP ($300 trial credit)
+google-auth>=2.0.0            # Service account credentials for Vertex AI
+
+# --- Evaluation ---
+ragas>=0.2.6                  # RAG evaluation: faithfulness, relevancy, precision, recall
+datasets>=2.20.0              # HuggingFace datasets (used by RAGAS)
+
+# --- UI ---
+streamlit>=1.40.0
+
+# --- Experiment Tracking & Visualization ---
+plotly>=5.24.0                # Interactive charts for retrieval visualization
+pandas>=2.2.0                 # Data manipulation
+
+# --- Development & Code Quality ---
+black>=24.0.0                 # Code formatting
+ruff>=0.8.0                   # Linting
+pytest>=8.0.0                 # Testing
+ipykernel>=6.29.0             # Jupyter notebook support

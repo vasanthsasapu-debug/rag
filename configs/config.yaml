@@ -1,0 +1,120 @@
+# ============================================================
+# RAG System Configuration
+# ============================================================
+# This file controls all experiment variables.
+# Change settings here — code stays the same.
+# ============================================================
+
+# --- LLM Provider ---
+# Provider priority: primary → fallback (auto-switches on failure)
+# Options: "groq", "vertex_ai", "google", "openai", "anthropic"
+llm:
+  primary: "groq"             # Free: 30 RPM, 14,400 RPD
+  fallback: "vertex_ai"       # GCP $300 trial credit — high rate limits
+  models:
+    groq: "llama-3.1-70b-versatile"
+    vertex_ai: "gemini-2.5-flash"       # Via Vertex AI ($300 trial credit)
+    google: "gemini-2.5-flash"          # Free backup: 15 RPM, 500 RPD
+    openai: "gpt-4o-mini"               # If you get enterprise API access
+    anthropic: "claude-sonnet-4-20250514"    # If you get enterprise API access
+  temperature: 0.1
+  max_tokens: 1024
+
+# --- Vertex AI Configuration ---
+# Set these in your .env file:
+#   GOOGLE_CLOUD_PROJECT=your-project-id
+#   GOOGLE_CLOUD_LOCATION=us-central1
+# Then authenticate: gcloud auth application-default login
+vertex_ai:
+  project: "${GOOGLE_CLOUD_PROJECT}"     # Set in .env
+  location: "${GOOGLE_CLOUD_LOCATION}"   # Default: us-central1
+
+# --- Chunking Strategies ---
+# All 3 run by default for comparison
+chunking:
+  strategies:
+    fixed:
+      chunk_size: 512          # tokens
+      chunk_overlap: 50        # tokens
+    recursive:
+      chunk_size: 1000         # characters
+      chunk_overlap: 200       # characters
+    semantic:
+      max_chunk_size: 1500     # characters (hard cap)
+      similarity_threshold: 0.75
+
+# --- Embedding Models to Compare ---
+# 3 local (free) + 1 Vertex AI (GCP credit) = 4 models
+embeddings:
+  models:
+    - name: "all-MiniLM-L6-v2"
+      type: "sentence-transformers"
+      dimension: 384
+      description: "Fast, lightweight — good baseline"
+
+    - name: "all-mpnet-base-v2"
+      type: "sentence-transformers"
+      dimension: 768
+      description: "Higher quality, slower"
+
+    - name: "BAAI/bge-large-en-v1.5"
+      type: "sentence-transformers"
+      dimension: 1024
+      description: "State-of-the-art open source"
+
+    - name: "text-embedding-005"
+      type: "vertex_ai"
+      dimension: 768
+      description: "Google Vertex AI embedding — GCP $300 trial credit"
+
+  # Default model for development (free, no API key needed)
+  default: "all-MiniLM-L6-v2"
+
+# --- Retrieval Strategies ---
+retrieval:
+  strategies:
+    - name: "dense_only"
+      description: "Pure vector similarity search"
+      top_k: 10
+
+    - name: "bm25_only"
+      description: "Pure keyword/sparse retrieval"
+      top_k: 10
+
+    - name: "hybrid"
+      description: "Dense + BM25 with Reciprocal Rank Fusion"
+      top_k: 10
+      dense_weight: 0.7
+      sparse_weight: 0.3
+
+    - name: "hybrid_rerank"
+      description: "Hybrid + cross-encoder re-ranking"
+      top_k: 10
+      rerank_model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+      rerank_top_k: 5
+
+# --- Vector Store ---
+vector_store:
+  provider: "chromadb"
+  persist_dir: "./data/chroma_db"
+
+# --- Evaluation (RAGAS) ---
+# RAGAS evaluator LLM priority: Vertex AI Gemini > free Gemini > OpenAI
+evaluation:
+  evaluator_llm: "vertex_ai"    # Uses Gemini Flash via Vertex AI for judging
+  metrics:
+    - faithfulness
+    - answer_relevancy
+    - context_precision
+    - context_recall
+  test_queries_file: "./data/eval/test_queries.json"
+  num_test_queries: 50
+
+# --- Paths ---
+paths:
+  raw_pdfs: "./data/raw_pdfs"
+  processed: "./data/processed"
+  chunks: "./data/processed/chunks"
+  metadata: "./data/paper_metadata.json"
+  chroma_db: "./data/chroma_db"
+  results: "./results"

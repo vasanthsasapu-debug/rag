@@ -1,0 +1,36 @@
+# Environment
+.env
+.venv/
+venv/
+env/
+ragenv/
+
+# Data (too large for git)
+data/
+Docs/
+*.pdf
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+older version/
+api_key.json
